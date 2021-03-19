@@ -1,37 +1,39 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMove : MonoBehaviour
 {
+    public Slider playerSlider;
+    public GameObject gameObject;
+
     //이동 관련 변수
     [SerializeField] float moveSpeed = 5f;
     [SerializeField] float jumpPower = 10f;
 
     //점프 방향 관련 변수
-    [SerializeField] Vector2 jumpDirVector = new Vector2(0.75f, 0.25f);
+    [SerializeField] Vector2 jumpDirVector;
     [SerializeField] float jumpDirnumber;
+    Vector2 mousePosition;
 
-    float playerHorizontal;
-
+    //점프 시간 관련 변수
+    [Range(1, 2)]
+    public float jumpBoostTime;
     public float elapsedTime = 0f;
     public bool isJump = false;
 
-    Vector3 mousePosition;
 
     SpriteRenderer playerSpriteRenderer;
-    PlayerController playerController;
-    Transform playerTransform;
     Rigidbody2D playerRigidbody2D;
     Animator playerAnimator;
 
     void Start()
     {
+        playerSlider.value = 0;
         playerSpriteRenderer = GetComponent<SpriteRenderer>();
-        playerTransform = GetComponent<Transform>();
         playerAnimator = GetComponent<Animator>();
         playerRigidbody2D = GetComponent<Rigidbody2D>();
-        playerController = GetComponent<PlayerController>();
     }
 
     void Update()
@@ -54,33 +56,42 @@ public class PlayerMove : MonoBehaviour
 
     void Jump()
     {
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") /*&& playerAnimator.GetBool("ddd")*/)
         {
             isJump = true;
         }
-        else if (Input.GetButtonUp("Jump"))
+        else if (Input.GetButtonUp("Jump") /*&& playerAnimator.GetBool("ddd")*/)
         {
             // 사용자 input에 따른 대각선 방향 계산
-            mousePosition = Input.mousePosition;
+            mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            jumpDirVector = (mousePosition - transform.position).normalized;
+            jumpDirVector = (mousePosition - new Vector2(transform.position.x, transform.position.y));
 
             Move(mousePosition);
 
-            Vector2 dirVector2 = jumpDirVector;
-            //Vector2 dirVector2 = new Vector2(jumpDirVector.x * jumpDirnumber, jumpDirVector.y);
+            playerRigidbody2D.AddForce(jumpDirVector.normalized * jumpPower * elapsedTime, ForceMode2D.Impulse);
 
-            playerRigidbody2D.AddForce(dirVector2 * jumpPower * elapsedTime, ForceMode2D.Impulse);
-            Debug.Log("점프: " + dirVector2 + " : " + jumpDirnumber);
-
+            playerSlider.value = 0;
             elapsedTime = 0f;
             isJump = false;
         }
 
         if (isJump)
         {
-            elapsedTime += Time.deltaTime;
-        }
+            elapsedTime += (Time.deltaTime);
+
+            if(elapsedTime >= 1)
+            {
+                elapsedTime = 1;
+            }
+            FillSlider(elapsedTime);
+        } 
+    }
+
+    void FillSlider(float elapsedTime)
+    {
+        playerSlider.value = elapsedTime * 100;
+        Debug.Log(elapsedTime * 100);
     }
 
     void LandingJump()
@@ -93,7 +104,6 @@ public class PlayerMove : MonoBehaviour
             if (raycastHit2D.distance <= 0.5f)
             {
                 //playerAnimator.SetBool("애니메이션 이름");
-                Debug.Log("땅에 착지");
             }
         }
     }
