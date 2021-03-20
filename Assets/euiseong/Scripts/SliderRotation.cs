@@ -5,14 +5,13 @@ using UnityEngine;
 public class SliderRotation : MonoBehaviour
 {
     public float speed = 5f;
-
     public PlayerMove playermove;
 
     void Update()
     {
-        Vector3 mouse = Input.mousePosition;
-        mouse = Camera.main.ScreenToWorldPoint(mouse);
-        Vector2 direction = mouse - transform.position;
+        Vector3 mousePosition = Input.mousePosition;
+        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+        Vector2 direction = mousePosition - transform.position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         angle = CheckPositiveAngle(angle);

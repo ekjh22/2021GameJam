@@ -14,6 +14,7 @@ public class Platform : MonoBehaviour
         if (collision.tag.Equals("Player"))
         {
             Destroy(platform, time);
+            Debug.Log("부서지는 플랫폼!!");
         }
     }
 }

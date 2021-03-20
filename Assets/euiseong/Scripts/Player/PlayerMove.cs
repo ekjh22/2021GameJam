@@ -24,7 +24,6 @@ public class PlayerMove : MonoBehaviour
     SpriteRenderer playerSpriteRenderer;
     Rigidbody2D playerRigidbody2D;
     Animator playerAnimator;
-
     CircleCollider2D playerCircleCollider2D;
 
     void Start()
@@ -32,7 +31,6 @@ public class PlayerMove : MonoBehaviour
         playerSpriteRenderer = GetComponent<SpriteRenderer>();
         playerAnimator = GetComponent<Animator>();
         playerRigidbody2D = GetComponent<Rigidbody2D>();
-
         playerCircleCollider2D = GetComponent<CircleCollider2D>();
     }
 
@@ -62,7 +60,6 @@ public class PlayerMove : MonoBehaviour
         }
         else if (Input.GetButtonUp("Jump") && !playerAnimator.GetBool("isJump"))
         {
-            // 사용자 input에 따른 대각선 방향 계산
             mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
             jumpDirVector = (mousePosition - new Vector2(transform.position.x, transform.position.y));
@@ -73,9 +70,7 @@ public class PlayerMove : MonoBehaviour
 
             elapsedTime = 0f;
             isJump = false;
-
             playerAnimator.SetBool("isJump", true);
-            Debug.Log("플레이어 점프");
         }
 
         if (isJump)
@@ -97,11 +92,6 @@ public class PlayerMove : MonoBehaviour
         {
             if (raycastHit2D.distance <= 0.01f && playerRigidbody2D.velocity.y <= 0)
             {
-                if (playerAnimator.GetBool("isJump"))
-                {
-                    Debug.Log("플레이어 착지");
-                }
-                
                 playerAnimator.SetBool("isJump", false);
             }
         }
