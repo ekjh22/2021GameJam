@@ -5,11 +5,9 @@ using UnityEngine.UI;
 
 public class PlayerMove : MonoBehaviour
 {
-    public Slider playerSlider;
-    public GameObject gameObject;
+    public float ratcastValue;
 
     //이동 관련 변수
-    [SerializeField] float moveSpeed = 5f;
     [SerializeField] float jumpPower = 10f;
 
     //점프 방향 관련 변수
@@ -23,17 +21,19 @@ public class PlayerMove : MonoBehaviour
     public float elapsedTime = 0f;
     public bool isJump = false;
 
-
     SpriteRenderer playerSpriteRenderer;
     Rigidbody2D playerRigidbody2D;
     Animator playerAnimator;
 
+    CircleCollider2D playerCircleCollider2D;
+
     void Start()
     {
-        playerSlider.value = 0;
         playerSpriteRenderer = GetComponent<SpriteRenderer>();
         playerAnimator = GetComponent<Animator>();
         playerRigidbody2D = GetComponent<Rigidbody2D>();
+
+        playerCircleCollider2D = GetComponent<CircleCollider2D>();
     }
 
     void Update()
@@ -56,11 +56,11 @@ public class PlayerMove : MonoBehaviour
 
     void Jump()
     {
-        if (Input.GetButtonDown("Jump") /*&& playerAnimator.GetBool("ddd")*/)
+        if (Input.GetButtonDown("Jump") && !playerAnimator.GetBool("isJump"))
         {
             isJump = true;
         }
-        else if (Input.GetButtonUp("Jump") /*&& playerAnimator.GetBool("ddd")*/)
+        else if (Input.GetButtonUp("Jump") && !playerAnimator.GetBool("isJump"))
         {
             // 사용자 input에 따른 대각선 방향 계산
             mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
@@ -71,39 +71,38 @@ public class PlayerMove : MonoBehaviour
 
             playerRigidbody2D.AddForce(jumpDirVector.normalized * jumpPower * elapsedTime, ForceMode2D.Impulse);
 
-            playerSlider.value = 0;
             elapsedTime = 0f;
             isJump = false;
+
+            playerAnimator.SetBool("isJump", true);
+            Debug.Log("플레이어 점프");
         }
 
         if (isJump)
         {
             elapsedTime += (Time.deltaTime);
 
-            if(elapsedTime >= 1)
+            if (elapsedTime >= 1)
             {
                 elapsedTime = 1;
             }
-            FillSlider(elapsedTime);
-        } 
-    }
-
-    void FillSlider(float elapsedTime)
-    {
-        playerSlider.value = elapsedTime * 100;
-        Debug.Log(elapsedTime * 100);
+        }
     }
 
     void LandingJump()
     {
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(playerRigidbody2D.position, Vector2.down, 1, LayerMask.GetMask("Ground"));
-        Debug.DrawRay(playerRigidbody2D.position, Vector2.down * 1.0f, Color.red);
-        
+        RaycastHit2D raycastHit2D = Physics2D.BoxCast(playerCircleCollider2D.bounds.center, playerCircleCollider2D.bounds.size, 0, Vector2.down, 0.01f, LayerMask.GetMask("Ground"));
+
         if (raycastHit2D.collider != null)
         {
-            if (raycastHit2D.distance <= 0.5f)
+            if (raycastHit2D.distance <= 0.01f && playerRigidbody2D.velocity.y <= 0)
             {
-                //playerAnimator.SetBool("애니메이션 이름");
+                if (playerAnimator.GetBool("isJump"))
+                {
+                    Debug.Log("플레이어 착지");
+                }
+                
+                playerAnimator.SetBool("isJump", false);
             }
         }
     }

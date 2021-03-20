@@ -4,12 +4,34 @@ using UnityEngine;
 
 public class SliderRotation : MonoBehaviour
 {
-    public Vector3 mousePosition;
+    public float speed = 5f;
+
+    public PlayerMove playermove;
+
     void Update()
     {
-        mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mouse = Input.mousePosition;
+        mouse = Camera.main.ScreenToWorldPoint(mouse);
+        Vector2 direction = mouse - transform.position;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        Vector3 l_vector = mousePosition - transform.position;
-        transform.rotation = Quaternion.LookRotation(l_vector).normalized;
+        angle = CheckPositiveAngle(angle);
+
+        transform.localScale = new Vector3(playermove.elapsedTime, transform.localScale.y, transform.localScale.z);
+
+        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, speed * Time.deltaTime);
+    }
+    float CheckPositiveAngle(float angle)
+    {
+        if(angle <= -90 && angle >= -180)
+        {
+            angle = 180;
+        }
+        else if(angle > -90 && angle <= 0)
+        {
+            angle = 0;
+        }
+        return angle;
     }
 }
