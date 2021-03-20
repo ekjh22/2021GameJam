@@ -3,9 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Follower
-  - Obstacle
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -15,11 +13,11 @@ TagManager:
   - UI
   - 
   - 
+  - MapLock
   - Ground
   - Player
-  - 
-  - 
-  - 
+  - PlayerAttack
+  - Portal
   - 
   - 
   - 
@@ -43,9 +41,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: player
-    uniqueID: 3798090531
-    locked: 0
-  - name: follower
-    uniqueID: 4221712305
+  - name: Player
+    uniqueID: 1696558277
     locked: 0
